@@ -151,26 +151,42 @@ check_winner()
 }
 
 
+is_table_input_valid()
+{
+	if [[ ($row_index < 1) || ($row_index > 3) || ($col_index < 1) || ($col_index > 3) ]]
+	then
+		is_input_valid=1	
+	else
+		is_input_valid=0
+		board_value_at_field=${arr[${row_index},${col_index}]}
+	fi
+}
+
 player_move()
 {
 	print_board
 	echo "Provide filed (1,1 filed should be represented as 11)"
 	echo "If you want to save game provide 's' letter"
 	read -r candidate_field_index
+	declare -i row_index=${candidate_field_index:0:1}
+	declare -i col_index=${candidate_field_index:1:1}
 	
-	board_value_at_field=${arr[${candidate_field_index:0:1},${candidate_field_index:1:1}]}
+	is_table_input_valid
 	
 	if [[ $candidate_field_index == "s" ]]
 	then
 		save_game
 	fi
 	
-	while [[ $board_value_at_field == "$1" ]] || [[ $board_value_at_field == "$2" ]]
+	while [[ $board_value_at_field == "$1" ]] || [[ $is_input_valid == 1 ]] || [[ $board_value_at_field == "$2" ]]
 	do
-		echo "You provide invalid, non empty value"
+		echo "You provide invalid/non empty value"
 		echo "Provide filed (1,1 filed should be represented as 11)"
 		read -r candidate_field_index
-		board_value_at_field=${arr[${candidate_field_index:0:1},${candidate_field_index:1:1}]}
+		
+		row_index=${candidate_field_index:0:1}
+		col_index=${candidate_field_index:1:1}
+		is_table_input_valid
 	done
 	
 	arr[${candidate_field_index:0:1},${candidate_field_index:1:1}]=$1
